@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:shape="oval"
+    >
+   <!-- shape取值有四种，可以是rectangle（长方形），oval（椭圆），line（线条），ring（圆环），
+    -->
+   <size
+       android:width="110dp"
+       android:height="110dp"/>
+   <!-- oval是椭圆,所以宽高一样才能做出圆形的效果
+    -->
+
+</shape>

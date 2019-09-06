@@ -1,0 +1,3 @@
+include ':app', ':serial', ':serial_lib', ':libusbcamera'
+include ':openCVLibrary341'
+include ':openCVLibrary341'

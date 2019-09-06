@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/image_back_face"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.serenegiant.usb.widget.UVCCameraTextureView
+            android:id="@+id/camera_view"
+            android:layout_width="790dp"
+            android:layout_height="580dp"
+            android:rotation="90"
+            android:layout_marginTop="550dp"
+            android:layout_gravity="center_horizontal"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <TextView
+                android:id="@+id/equipment_debugging_usb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:maxLines="4"
+                android:layout_marginTop="1800dp"
+                android:layout_marginLeft="-420dp"
+                android:textColor="@android:color/white"
+                android:textSize="15dp"
+                android:text="身高:\n体重:\n生物阻抗:\n图片编码:"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>
