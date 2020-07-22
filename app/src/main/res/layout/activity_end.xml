@@ -30,7 +30,7 @@
                 android:id="@+id/machie_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1105dp"
+                android:layout_marginTop="1005dp"
                 android:textColor="@android:color/holo_orange_light"
                 android:textSize="95sp"
                 android:textStyle="bold"
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:maxLines="4"
-                android:layout_marginTop="1800dp"
+                android:layout_marginTop="1700dp"
                 android:layout_marginLeft="-420dp"
                 android:textColor="@android:color/white"
                 android:textSize="15dp"
@@ -59,9 +59,9 @@
         </LinearLayout>
         <ImageView
             android:id="@+id/image_log"
-            android:layout_width="445dp"
-            android:layout_height="445dp"
-            android:layout_marginTop="275dp"
+            android:layout_width="405dp"
+            android:layout_height="405dp"
+            android:layout_marginTop="265dp"
             android:background="@color/ALICEBLUE"
             android:layout_gravity="center_horizontal"/>
     </FrameLayout>

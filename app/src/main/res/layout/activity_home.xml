@@ -4,26 +4,26 @@
     android:layout_height="wrap_content">
 
 
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <pl.droidsonroids.gif.GifImageView
             android:id="@+id/gif"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY" />
 
 
         <Button
             android:id="@+id/calibration_weight"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="75dp"
-            android:onClick="calibrationWeight"
             android:background="@drawable/yuanxing_btn"
-            android:layout_gravity="center_horizontal"/>
+            android:onClick="calibrationWeight" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,29 +36,27 @@
                 android:id="@+id/equipment_debugging"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
                 android:layout_gravity="bottom"
+                android:clickable="true"
                 android:paddingLeft="10dp"
+                android:paddingTop="1770dp"
+                android:text="设备编号:DCLK34893488"
                 android:textColor="@android:color/white"
                 android:textSize="15dp"
-                android:text="设备编号:DCLK34893488"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/calibration_height"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
                 android:layout_gravity="bottom"
+                android:clickable="true"
                 android:paddingLeft="700dp"
+                android:paddingTop="1770dp"
+                android:text="设备编号:DCLK34893488"
                 android:textColor="@android:color/white"
                 android:textSize="15dp"
-                android:text="设备编号:DCLK34893488"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
     </FrameLayout>
-
-
-
-
 </LinearLayout>

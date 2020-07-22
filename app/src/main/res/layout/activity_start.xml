@@ -25,7 +25,7 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="418dp">
+            android:paddingTop="238dp">
 
             <TextView
                 android:id="@+id/machie_tv"
@@ -34,6 +34,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="200sp"
                 android:textStyle="bold"
+                android:text="3"
                 tools:text="3" />
                 android:textStyle="bold" />
         </LinearLayout>

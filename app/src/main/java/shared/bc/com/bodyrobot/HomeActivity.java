@@ -1,6 +1,7 @@
 package shared.bc.com.bodyrobot;
 
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -24,6 +25,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
@@ -46,6 +49,7 @@ import org.opencv.ObjectDetector;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
@@ -83,22 +87,22 @@ import shared.bc.com.bodyrobot.until.DeleteImage;
 import shared.bc.com.bodyrobot.until.IMEIUtils;
 import shared.bc.com.bodyrobot.until.SharedProtocol;
 
-//
-///**
-// * @author goJee
-// * @since 2019/3/28
-// */
+
+/**
+ * @author goJee
+ * @since 2019/3/28
+ */
 public class HomeActivity extends SerialPortActivity implements CameraDialog.CameraDialogParent, CameraViewInterface.Callback {
-//
-//
-    private int state=0;
+
+
+    private int state = 0;
     public String IMEI = "IMEI";
 
     public int num = 0;
     private SharedPreferences sp;
-    private float [] information =new float[3];
-    private float [] informationfat = new float[9];
-    private List<String> list= new ArrayList();
+    private float[] information = new float[3];
+    private float[] informationfat = new float[9];
+    private List<String> list = new ArrayList();
     private static final String TAG = "SerialPortActivity";
 
     private GifImageView gifView;
@@ -137,6 +141,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     static {
         System.loadLibrary("opencv_java3");
     }
+
     private UVCCameraHelper.OnMyDevConnectListener listener = new UVCCameraHelper.OnMyDevConnectListener() {
 
         @Override
@@ -172,7 +177,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             } else {
                 isPreview = true;
                 showShortMsg("connecting");
-                Log.e("连接的摄像头id",device.getDeviceId()+"");
+                Log.e("连接的摄像头id", device.getDeviceId() + "");
             }
         }
 
@@ -187,7 +192,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     protected void onCreate(Bundle savedInstanceState) {
         LogcatHelper.getInstance(this).start();
         initImei();
-
+        checkPromission();
         super.onCreate(savedInstanceState);
         instance = this;
         AutoInstallService.callback = null;
@@ -203,23 +208,25 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         new Thread(new Runnable() {
             @Override
             public void run() {
-                httpCode(UpdateApk.getVersionCode(HomeActivity.this) ,getAppVersionName(HomeActivity.this));
+                httpCode(UpdateApk.getVersionCode(HomeActivity.this), getAppVersionName(HomeActivity.this));
             }
         }).start();
         thread3.start();
         thread4.start();
         thread5.start();
     }
+
+    //
 //
 //
-//
-    private void Task(){
+    private void Task() {
         Scheduler scheduler = new Scheduler();
         // Schedules the task, once every minute.
         scheduler.schedule("* * * * *", new DeleteImage());
         // Starts the scheduler.
         scheduler.start();
     }
+
     private void initImei() {
         sp = getSharedPreferences(Constants.SharedPref, MODE_PRIVATE);
         IMEI = sp.getString(Constants.SP_IMEI, "");
@@ -235,6 +242,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 ////        IMEI = "355099048440815";
 //        Log.d(TAG, "IMEI: " + IMEI);
     }
+
     @Override
     protected void onDataReceived(byte[] buffer, int size) {
         byte[] data = new byte[size];
@@ -255,11 +263,11 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         hideNavigation();
         debugView = (TextView) findViewById(R.id.equipment_debugging);
         calibrationHeight = (TextView) findViewById(R.id.calibration_height);
-        debugView.setText("版本号:"+getAppVersionName(HomeActivity.this)+"-release");
-        calibrationHeight.setText("设备编号:"+IMEI);
+        debugView.setText("版本号:" + getAppVersionName(HomeActivity.this) + "-release");
+        calibrationHeight.setText("设备编号:" + IMEI);
         state = 0;
         gifView = (GifImageView) findViewById(R.id.gif);
-        if(!debug){
+        if (!debug) {
             debugView.setTextColor(Color.parseColor("#FF0000"));
         }
         try {
@@ -289,7 +297,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 //        });
         calibrationHeight.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0){
+            public void onClick(View arg0) {
                 String data = "FA87010187";
                 byte[] sendData = hex2byte(data);
                 writeBytes(sendData);
@@ -299,11 +307,11 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         });
         debugView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0){
-                if(debug) {
+            public void onClick(View arg0) {
+                if (debug) {
                     debugView.setTextColor(Color.parseColor("#FF0000"));
                     debug = false;
-                }else{
+                } else {
                     debugView.setTextColor(Color.parseColor("#FFFFFF"));
                     debug = true;
                 }
@@ -314,7 +322,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     }
     //准备检测
 
-    public void calibrationWeight(View v){
+    public void calibrationWeight(View v) {
         String data = "FA86010087";
         byte[] sendData = hex2byte(data);
         writeBytes(sendData);
@@ -333,8 +341,9 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
         return bytes;
     }
+
     private void Start() {
-        if(state == 0) {
+        if (state == 0) {
             setContentView(R.layout.activity_start);
             state = -1;
             textView = (TextView) findViewById(R.id.machie_tv);
@@ -357,7 +366,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                         textView.setText(text);
                         mHandler.postDelayed(this, 1000);
                     } else {
-                        if(state == -1) {
+                        if (state == -1) {
                             Height();
                         }
                     }
@@ -367,20 +376,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
     }
 
-    private void Height(){
+    private void Height() {
         setContentView(R.layout.activity_height);
         String s;
         state = 1;
         try {
-            gifView = (GifImageView)findViewById(R.id.height_gif);
-            debugView = (TextView)findViewById(R.id.equipment_debugging_height);
-            debugView = (TextView)findViewById(R.id.equipment_debugging_height);
+            gifView = (GifImageView) findViewById(R.id.height_gif);
+            debugView = (TextView) findViewById(R.id.equipment_debugging_height);
+            debugView = (TextView) findViewById(R.id.equipment_debugging_height);
             GifDrawable gifFromResource = new GifDrawable(getResources(), R.drawable.image_back_height);
             gifView.setImageDrawable(gifFromResource);
-            if(debug == false){
-                s =  "身高:\n体重:\n生物阻抗:\n图片编码:";
+            if (debug == false) {
+                s = "身高:\n体重:\n生物阻抗:\n图片编码:";
                 debugView.setText(s);
-            }else{
+            } else {
                 s = "";
                 debugView.setText(s);
             }
@@ -395,23 +404,23 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(state == 1) {
+                if (state == 1) {
                     handler.post(runnableUi5);
                 }
             }
-        },11000);
+        }, 11000);
 
 
     }
 
-    private void Weight(){
-        if(state == 1) {
+    private void Weight() {
+        if (state == 1) {
             String s;
             setContentView(R.layout.activity_weight);
             debugView = (TextView) findViewById(R.id.equipment_debugging_weight);
             state = 2;
             if (debug == false && information[0] != 0) {
-                s = "身高:" + information[0]+"cm" + "\n体重:\n生物阻抗:\n图片编码:";
+                s = "身高:" + information[0] + "cm" + "\n体重:\n生物阻抗:\n图片编码:";
                 debugView.setText(s);
             } else {
                 s = "";
@@ -440,14 +449,14 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
     }
 
-    private void Fat(){
-        if(state == 2) {
+    private void Fat() {
+        if (state == 2) {
             String s;
             setContentView(R.layout.activity_fat);
             state = 3;
             debugView = (TextView) findViewById(R.id.equipment_debugging_fat);
             if (debug == false && information[0] != 0 && information[1] != 0) {
-                s = "身高:" + information[0] + "cm"+"\n体重:" + information[1] +"kg"+ "\n生物阻抗:\n图片编码:";
+                s = "身高:" + information[0] + "cm" + "\n体重:" + information[1] + "kg" + "\n生物阻抗:\n图片编码:";
                 debugView.setText(s);
             } else {
                 s = "";
@@ -479,8 +488,8 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
     }
 
-    private void Facial(){
-        if(state == 3) {
+    private void Facial() {
+        if (state == 3) {
             String s;
             setContentView(R.layout.activity_facial);
             textView = (TextView) findViewById(R.id.machie_facial);
@@ -488,7 +497,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             state = 4;
             debugView = (TextView) findViewById(R.id.equipment_debugging_facial);
             if (debug == false && information[0] != 0 && information[1] != 0 && information[2] != 0) {
-                s = "身高:" + information[0]+"cm" + "\n体重:" + information[1]+"kg" + "\n生物阻抗:" + information[2] + "\n图片编码:";
+                s = "身高:" + information[0] + "cm" + "\n体重:" + information[1] + "kg" + "\n生物阻抗:" + information[2] + "\n图片编码:";
                 debugView.setText(s);
             } else {
                 s = "";
@@ -516,13 +525,13 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                                 remain,
                                 "");
                         textView.setText(text);
-                        if(remain == 1){
+                        if (remain == 1) {
                             mHandler.postDelayed(this, 100);
-                        }else {
+                        } else {
                             mHandler.postDelayed(this, 700);
                         }
                     } else {
-                        if(state == 4) {
+                        if (state == 4) {
 //                            if(m == 1) {
 //                                mCameraHelper.updateResolution(1280, 720);
 //                                m=0;
@@ -553,7 +562,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if(state == 4) {
+                    if (state == 4) {
 //                        try {
 //                            mCameraHelper.stopPreview();
 //                        }catch (Exception e){
@@ -562,11 +571,12 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                         handler.post(runnableUi5);
                     }
                 }
-            },13000);
+            }, 13000);
         }
     }
-    public void face(){
-        if(mCameraHelper == null) {
+
+    public void face() {
+        if (mCameraHelper == null) {
             mUVCCameraView.setCallback(this);
             mCameraHelper = UVCCameraHelper.getInstance();
             mCameraHelper.initUSBMonitor(this, mUVCCameraView, listener);
@@ -578,7 +588,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     }
 
 
-    public void findFace(){
+    public void findFace() {
         mCameraHelper.setOnPreviewFrameListener(new AbstractUVCCameraHandler.OnPreViewResultListener() {
             @Override
             public void onPreviewResult(byte[] data) {
@@ -606,7 +616,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 //                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length,options);
                 int findFaceNum = convert2Grey(bitmap);
                 if (findFaceNum != 0) {
-                    if(state == 4) {
+                    if (state == 4) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -633,7 +643,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         Imgproc.cvtColor(temp, dst, Imgproc.COLOR_BGR2GRAY);
         Utils.matToBitmap(dst, bitmap);
         MatOfRect mObject = new MatOfRect();
-        int a = mFaceDetector.detectObject(dst,mObject).length;
+        int a = mFaceDetector.detectObject(dst, mObject).length;
 
         src.release();
         temp.release();
@@ -642,13 +652,13 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         return a;
     }
 
-    public void taskPhoto(){
+    public void taskPhoto() {
         String path = UVCCameraHelper.ROOT_PATH + "/Xiaoti Robot";
         File file = new File(path);
-        if(!file.exists()){
+        if (!file.exists()) {
             file.mkdirs();
         }
-        name = System.currentTimeMillis()+"";
+        name = System.currentTimeMillis() + "";
         if (mCameraHelper == null || !mCameraHelper.isCameraOpened()) {
             showShortMsg("sorry,camera open failed");
         }
@@ -657,9 +667,22 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         mCameraHelper.capturePicture(picPath, new AbstractUVCCameraHandler.OnCaptureListener() {
             @Override
             public void onCaptureResult(String path) {
-                Log.e(TAG,"save path：" + path);
+                Log.e(TAG, "save path：" + path);
             }
         });
+    }
+
+    private void checkPromission() {
+        if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, 1);
+        }
+        if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            }, 1);
+        }
     }
 
     @Override
@@ -698,7 +721,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
     }
 
-    public void toReport(){
+    public void toReport() {
         Intent intent = new Intent(this, ReportActivity.class);
         intent.putExtra("height", information[0]);
         intent.putExtra("weight", information[1]);
@@ -708,21 +731,21 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         startActivity(intent);
     }
 
-    private void USBCamera(){
+    private void USBCamera() {
 
         state = 5;
-        Intent intent = new Intent(this,USBCameraActivity.class);
+        Intent intent = new Intent(this, USBCameraActivity.class);
         intent.putExtra("information", information);
         intent.putExtra("debug", debug);
-        Log.d("",information.toString());
+        Log.d("", information.toString());
         startActivity(intent);
     }
 
 
     //缺失页
-    private void failure(){
-        if(state != 10 && state != 11 && state != 12 && state != 13 && state != 0) {
-            if(state != -2) {
+    private void failure() {
+        if (state != 10 && state != 11 && state != 12 && state != 13 && state != 0) {
+            if (state != -2) {
                 Intent intent = new Intent(this, FailureActivity.class);
                 startActivity(intent);
                 new Thread(new Runnable() {
@@ -731,7 +754,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                         switchhttp();
                         state = -2;
                     }
-                    }).start();
+                }).start();
             }
         }
     }
@@ -750,7 +773,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         super.onPause();
         try {
             mCameraHelper.stopPreview();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // step.3 unregister USB event broadcast
@@ -759,7 +782,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("USB","断开Camera");
+        Log.e("USB", "断开Camera");
         if (mCameraHelper != null) {
             mCameraHelper.unregisterUSB();
         }
@@ -785,7 +808,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         moveTaskToBack(true);
     }
 
-    private void CalibrationHeight(){
+    private void CalibrationHeight() {
         state = 20;
         setContentView(R.layout.activity_calibration_height);
         list.clear();
@@ -796,13 +819,14 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                ArrayAdapter<String> adapter=new ArrayAdapter<String>(HomeActivity.this,android.R.layout.simple_list_item_1,list);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(HomeActivity.this, android.R.layout.simple_list_item_1, list);
                 listView.setAdapter(adapter);
                 mHandler.postDelayed(this, 1000);
             }
         });
     }
-    private void HeightEnd(){
+
+    private void HeightEnd() {
 
         setContentView(R.layout.activity_calibration_height);
         cHeight = findViewById(R.id.height_calibration);
@@ -819,18 +843,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                     }
                 });
             }
-        },3000);
+        }, 3000);
 
     }
-    private void Calibration(){
+
+    private void Calibration() {
         state = 10;
         setContentView(R.layout.activity_weight_calibration);
         calibrationWeight = findViewById(R.id.weight_calibration);
         String text = "已进入标中模式,请拿开秤上重物!";
         calibrationWeight.setText(text);
     }
-    private void Weight50(){
-        if(state == 10) {
+
+    private void Weight50() {
+        if (state == 10) {
             state = 11;
             String text = "请放上50kg物品!";
             calibrationWeight.setText(text);
@@ -838,8 +864,9 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
 
     }
-    private void Weight100(){
-        if(state == 11) {
+
+    private void Weight100() {
+        if (state == 11) {
             state = 12;
             String text = "请放上100kg物品!";
             calibrationWeight.setText(text);
@@ -847,8 +874,9 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
 
     }
-    private void Weight150(){
-        if(state == 12) {
+
+    private void Weight150() {
+        if (state == 12) {
             state = 13;
             String text = "请放上150kg物品!";
             calibrationWeight.setText(text);
@@ -856,8 +884,9 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
 
     }
-    private void WeightEnd(){
-        if(state == 13) {
+
+    private void WeightEnd() {
+        if (state == 13) {
             String text = "标定完毕,退出标重模式!";
             calibrationWeight.setText(text);
             Timer timer = new Timer();
@@ -871,10 +900,11 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                         }
                     });
                 }
-            },3000);
+            }, 3000);
         }
 
     }
+
     private SharedProtocol.Listener mProtocolListener;
 
     {
@@ -888,8 +918,8 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             @Override
             public void temporary(float weight) {
                 Log.d(TAG, "weigh");
-                if(weight == 0){
-                    if( state== -1 || state == 1 || state == 2 || state ==3 || state == 4){
+                if (weight == 0) {
+                    if (state == -1 || state == 1 || state == 2 || state == 3 || state == 4) {
 //                        try {
 //                            mCameraHelper.stopPreview();
 //                        }catch (Exception e){
@@ -897,11 +927,11 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 //                        }
                         handler.post(runnableUi5);
                     }
-                    if(state == 5){
-                        handler.post(new Runnable(){
+                    if (state == 5) {
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if(USBCameraActivity.instance.state == 0) return;
+                                if (USBCameraActivity.instance.state == 0) return;
                                 USBCameraActivity.instance.failure();
                             }
                         });
@@ -916,34 +946,34 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
             @Override
             public void height(float height, int status) {
-                if(status == 1 && state !=0){
+                if (status == 1 && state != 0) {
                     information[0] = height;
                     handler.post(runnableUi3);
                 }
-                if(status == 0 && state ==0 ){
+                if (status == 0 && state == 0) {
                     information[0] = height;
                     handler.post(runnableUi);
                 }
-                if(status == 0 && state == 20){
-                    if(list.size() > 10){
+                if (status == 0 && state == 20) {
+                    if (list.size() > 10) {
                         list.remove(list.get(0));
                     }
-                    String test ="身高:"+height;
+                    String test = "身高:" + height;
                     list.add(test);
                 }
             }
 
             @Override
             public void FatStart(int status) {
-                if(status == 0){
+                if (status == 0) {
                     handler.post(runnableUi4);
                 }
             }
 
             @Override
             public void Fat(float[] fat) {
-                System.arraycopy(fat,0,informationfat,0,fat.length);
-                information[2] = fat[1]*10;
+                System.arraycopy(fat, 0, informationfat, 0, fat.length);
+                information[2] = fat[1] * 10;
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -974,7 +1004,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
             @Override
             public void weight150() {
-                    handler.post(runnableUi11);
+                handler.post(runnableUi11);
             }
 
             @Override
@@ -994,11 +1024,12 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
             @Override
             public void off() {
-                Log.e("收到关闭app的命令","开始关闭app");
+                Log.e("收到关闭app的命令", "开始关闭app");
 //                System.exit(0);
             }
         };
     }
+
     public static String getAppVersionName(Context context) {
         String appVersionName = "";
         try {
@@ -1012,17 +1043,17 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         return appVersionName;
     }
 
-    private void TcpConnect(){
+    private void TcpConnect() {
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (XTClient.channel == null || !XTClient.channel.isActive()) {
-                    if(thread != null){
+                    if (thread != null) {
                         thread.interrupt();
-                        Log.e("TCP","正在重连!!!!!!!!!!!!");
-                        if(num > 9){
+                        Log.e("TCP", "正在重连!!!!!!!!!!!!");
+                        if (num > 9) {
                             num = 0;
                             mHandler.post(new Runnable() {
                                 @Override
@@ -1037,33 +1068,34 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
                             }
 //                            reSetApp();
                         }
-                        num++ ;
+                        num++;
                     }
-                    Log.e("TCP","正在连接!!!!!!!!!!!!!!");
-                    thread =new XTClient(HomeActivity.this);
+                    Log.e("TCP", "正在连接!!!!!!!!!!!!!!");
+                    thread = new XTClient(HomeActivity.this);
                     thread.start();
                 }
             }
-        },1000,10000);
+        }, 1000, 10000);
 
 
-}
+    }
+
     private void showShortMsg(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    public void reSetApp(){
+    public void reSetApp() {
         Intent intent = getPackageManager()
                 .getLaunchIntentForPackage(getApplication().getPackageName());
         PendingIntent restartIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager mgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 10, restartIntent);
         System.exit(0);
     }
 
-    public void httpCode(int code , String version){
+    public void httpCode(int code, String version) {
         try {
-            String url1 = "http://"+ReportActivity.reporInstance.URL+"/api/updateVersion";
+            String url1 = "http://" + ReportActivity.reporInstance.URL + "/api/updateVersion";
             RequestBody formBody = new FormBody.Builder()
                     .add("deviceCode", IMEI)
                     .add("versionName", version)
@@ -1078,20 +1110,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    Log.d("版本号","发送失败!!!!!");
+                    Log.d("版本号", "发送失败!!!!!");
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    Log.d("版本号","发送成功!!!!!!!");
+                    Log.d("版本号", "发送成功!!!!!!!");
                 }
             });
-        }finally{
+        } finally {
 
         }
     }
 
-    Thread thread2=new Thread(new Runnable() {
+    Thread thread2 = new Thread(new Runnable() {
         @Override
         public void run() {
             TcpConnect();
@@ -1099,24 +1131,24 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     });
 
     public void switchhttp() {
-        switch (state){
-            case -1 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.FIRST_STEP.getValue()),IMEI);
+        switch (state) {
+            case -1:
+                HttpStep.httpRetained(String.valueOf(StepEnums.FIRST_STEP.getValue()), IMEI);
                 break;
-            case 1 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.HEIGHT_STEP.getValue()),IMEI);
+            case 1:
+                HttpStep.httpRetained(String.valueOf(StepEnums.HEIGHT_STEP.getValue()), IMEI);
                 break;
-            case 2 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.WEIGHT_STEP.getValue()),IMEI);
+            case 2:
+                HttpStep.httpRetained(String.valueOf(StepEnums.WEIGHT_STEP.getValue()), IMEI);
                 break;
-            case 3 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.FAT_STEP.getValue()),IMEI);
+            case 3:
+                HttpStep.httpRetained(String.valueOf(StepEnums.FAT_STEP.getValue()), IMEI);
                 break;
-            case 4 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.FACE_STEP.getValue()),IMEI);
+            case 4:
+                HttpStep.httpRetained(String.valueOf(StepEnums.FACE_STEP.getValue()), IMEI);
                 break;
-            case 5 :
-                HttpStep.httpRetained(String.valueOf(StepEnums.FACE_STEP.getValue()),IMEI);
+            case 5:
+                HttpStep.httpRetained(String.valueOf(StepEnums.FACE_STEP.getValue()), IMEI);
                 break;
         }
     }
@@ -1125,7 +1157,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     Thread thread3 = new Thread(new Runnable() {
         @Override
         public void run() {
-            if(getAppList("com.xiaoti.startxiaoti")) return;
+            if (getAppList("com.xiaoti.startxiaoti")) return;
             writeApp();
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -1144,7 +1176,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             }, 1000, 500);
         }
     });
-    Thread thread4=new Thread(new Runnable() {
+    Thread thread4 = new Thread(new Runnable() {
         @Override
         public void run() {
             setTopApp();
@@ -1152,11 +1184,11 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     });
 
 
-    Thread thread5=new Thread(new Runnable() {
+    Thread thread5 = new Thread(new Runnable() {
         @Override
         public void run() {
             String packageName = "com.xiaoti.startthexiaoti";
-            if(!getAppList(packageName)) return;
+            if (!getAppList(packageName)) return;
             try {
                 execCmd("pm uninstall " + packageName);
             } catch (Exception e) {
@@ -1164,6 +1196,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             }
         }
     });
+
     public static String execCmd(String cmd) throws Exception {
         StringBuilder result = new StringBuilder();
 
@@ -1175,7 +1208,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             // 执行命令, 返回一个子进程对象（命令在子进程中执行）
             process = Runtime.getRuntime().exec("/system/bin/su");
 
-            String cmd1 = cmd+"\n"
+            String cmd1 = cmd + "\n"
                     + "exit\n";
             process.getOutputStream().write(cmd1.getBytes());
 
@@ -1219,7 +1252,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
     }
 
-    private void setTopApp(){
+    private void setTopApp() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -1232,7 +1265,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     private void isRunning() {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
-        for (ActivityManager.RunningAppProcessInfo processInfo: list) {
+        for (ActivityManager.RunningAppProcessInfo processInfo : list) {
             if (processInfo.processName.equals("shared.bc.com.bodyrobot")) {
                 if (processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
                     Intent intent = this.getPackageManager().getLaunchIntentForPackage("shared.bc.com.bodyrobot");
@@ -1242,11 +1275,12 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             }
         }
     }
-    private void writeApp(){
+
+    private void writeApp() {
         InputStream is = null;
         try {
-            is = getAssets().open( "StartXiaoti.apk");
-            File file = new File(Environment.getExternalStorageDirectory(),"StartXiaoti.apk");
+            is = getAssets().open("StartXiaoti.apk");
+            File file = new File(Environment.getExternalStorageDirectory(), "StartXiaoti.apk");
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
             byte[] temp = new byte[1024];
@@ -1262,9 +1296,10 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setDataAndType(Uri.parse("file://" + Environment.getExternalStorageDirectory().getAbsolutePath()+"/StartXiaoti.apk"),"application/vnd.android.package-archive");
+        intent.setDataAndType(Uri.parse("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/StartXiaoti.apk"), "application/vnd.android.package-archive");
         startActivity(intent);
     }
+
     private boolean getAppList(String pack) {
         PackageManager pm = getPackageManager();
         // Return a List of all packages that are installed on the device.
@@ -1273,7 +1308,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
             // 判断系统/非系统应用
             if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) // 非系统应用
             {
-                if(packageInfo.packageName.equals(pack)){
+                if (packageInfo.packageName.equals(pack)) {
                     return true;
                 }
             }
@@ -1282,7 +1317,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
     }
 
 
-    Runnable   runnableUi=new  Runnable(){
+    Runnable runnableUi = new Runnable() {
         @Override
         public void run() {
 //            boolean isPlaying = false;
@@ -1302,20 +1337,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi3=new  Runnable(){
+    Runnable runnableUi3 = new Runnable() {
         @Override
         public void run() {
             boolean isPlaying = false;
             try {
                 isPlaying = mPlayer.isPlaying();
-            }catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             }
-            if(mPlayer.isPlaying()) {
+            if (mPlayer.isPlaying()) {
                 mPlayer.stop();
                 mPlayer.release();
             }
@@ -1324,21 +1359,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi4=new  Runnable(){
+    Runnable runnableUi4 = new Runnable() {
         @Override
         public void run() {
             boolean isPlaying = false;
             try {
                 isPlaying = mPlayer.isPlaying();
-            }catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
+                mPlayer = null;
+                mPlayer = new MediaPlayer();
+            } catch (Exception e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             }
-            catch (Exception e) {
-                mPlayer = null;
-                mPlayer = new MediaPlayer();
-            }
-            if(mPlayer.isPlaying()) {
+            if (mPlayer.isPlaying()) {
                 mPlayer.stop();
                 mPlayer.release();
             }
@@ -1347,21 +1381,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi5=new  Runnable(){
+    Runnable runnableUi5 = new Runnable() {
         @Override
         public void run() {
             boolean isPlaying = false;
             try {
                 isPlaying = mPlayer.isPlaying();
-            }catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
+                mPlayer = null;
+                mPlayer = new MediaPlayer();
+            } catch (Exception e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             }
-            catch (Exception e) {
-                mPlayer = null;
-                mPlayer = new MediaPlayer();
-            }
-            if(mPlayer.isPlaying()) {
+            if (mPlayer.isPlaying()) {
                 mPlayer.stop();
                 mPlayer.release();
             }
@@ -1371,28 +1404,27 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-//
+    //
 //    Thread thread3 = new Thread(new Runnable() {
 //        @Override
 //        public void run() {
 //            switchhttp();
 //        }
 //    });
-    Runnable   runnableUi6=new  Runnable(){
+    Runnable runnableUi6 = new Runnable() {
         @Override
         public void run() {
             boolean isPlaying = false;
             try {
                 isPlaying = mPlayer.isPlaying();
-            }catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
+                mPlayer = null;
+                mPlayer = new MediaPlayer();
+            } catch (Exception e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             }
-            catch (Exception e) {
-                mPlayer = null;
-                mPlayer = new MediaPlayer();
-            }
-            if(mPlayer.isPlaying()) {
+            if (mPlayer.isPlaying()) {
                 mPlayer.stop();
                 mPlayer.release();
             }
@@ -1401,7 +1433,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi7=new  Runnable(){
+    Runnable runnableUi7 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1410,20 +1442,20 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi8=new  Runnable(){
+    Runnable runnableUi8 = new Runnable() {
         @Override
         public void run() {
             boolean isPlaying = false;
             try {
                 isPlaying = mPlayer.isPlaying();
-            } catch(IllegalStateException e){
+            } catch (IllegalStateException e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             } catch (Exception e) {
                 mPlayer = null;
                 mPlayer = new MediaPlayer();
             }
-            if(mPlayer.isPlaying()) {
+            if (mPlayer.isPlaying()) {
                 mPlayer.stop();
                 mPlayer.release();
             }
@@ -1432,7 +1464,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi9=new  Runnable(){
+    Runnable runnableUi9 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1440,7 +1472,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi10=new  Runnable(){
+    Runnable runnableUi10 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1448,7 +1480,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi11=new  Runnable(){
+    Runnable runnableUi11 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1456,7 +1488,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
         }
 
     };
-    Runnable   runnableUi12=new  Runnable(){
+    Runnable runnableUi12 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1465,7 +1497,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
     };
 
-    Runnable   runnableUi13=new  Runnable(){
+    Runnable runnableUi13 = new Runnable() {
         @Override
         public void run() {
             //更新界面
@@ -1474,7 +1506,7 @@ public class HomeActivity extends SerialPortActivity implements CameraDialog.Cam
 
     };
 
-    Runnable   runnableUiReport=new  Runnable(){
+    Runnable runnableUiReport = new Runnable() {
         @Override
         public void run() {
             //更新界面

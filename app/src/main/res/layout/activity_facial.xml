@@ -25,10 +25,11 @@
                 android:id="@+id/machie_facial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="750dp"
+                android:layout_marginTop="550dp"
                 android:textColor="@android:color/holo_blue_light"
                 android:textSize="190sp"
                 android:textStyle="bold"
+                android:text="3"
                 tools:text="3" />
         </LinearLayout>
         <LinearLayout
@@ -44,19 +45,26 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:maxLines="4"
-                android:layout_marginTop="1800dp"
+                android:layout_marginTop="1700dp"
                 android:layout_marginLeft="-420dp"
                 android:textColor="@android:color/white"
                 android:textSize="15dp"
                 android:text="身高:\n体重:\n生物阻抗:\n图片编码:"
                 android:textStyle="bold"/>
         </LinearLayout>
+        <!--<TextView-->
+            <!--android:id="@+id/camera_view"-->
+            <!--android:layout_width="740dp"-->
+            <!--android:layout_height="540dp"-->
+            <!--android:rotation="90"-->
+            <!--android:layout_marginTop="560dp"-->
+            <!--android:layout_gravity="center_horizontal"/>-->
         <com.serenegiant.usb.widget.UVCCameraTextureView
             android:id="@+id/camera_view"
-            android:layout_width="790dp"
-            android:layout_height="580dp"
+            android:layout_width="600dp"
+            android:layout_height="400dp"
             android:rotation="90"
-            android:layout_marginTop="590dp"
+            android:layout_marginTop="410dp"
             android:layout_gravity="center_horizontal"/>
 
     </FrameLayout>
